@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMORK Notes</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+body{
+  background:#050816;
+  color:white;
+  font-family:system-ui;
+  overflow-x:hidden;
+  scroll-behavior:smooth;
+}
+
+/* HEADER FLOAT */
+h1{
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+  100%{transform:translateY(0)}
+}
+
+/* GLASS */
+.glass{
+  background:rgba(0,120,255,0.08);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(0,140,255,0.25);
+  transition:.3s;
+}
+.glass:hover{
+  transform:translateY(-5px);
+  box-shadow:0 15px 30px rgba(0,140,255,0.15);
+}
+
+/* INPUT */
+input, textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  outline:none;
+  background:#0a0f2c;
+  color:white;
+  border:1px solid rgba(0,140,255,0.2);
+}
+
+/* BUTTON */
+button{
+  transition:.3s;
+}
+button:hover{
+  transform:scale(1.03);
+}
+
+/* NOTE CARD */
+.card{
+  transition:.3s;
+}
+.card:hover{
+  transform:scale(1.02);
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#0a0f2c;
+  padding:10px 14px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+}
+</style>
+</head>
+
+<body class="p-5">
+
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-5">
+  <h1 class="text-xl font-bold">📝 SMORK NOTES</h1>
+  <i class="fa-solid fa-note-sticky text-blue-400"></i>
+</div>
+
+<!-- INPUT -->
+<div class="glass p-4 rounded-xl mb-5">
+  <input id="title" placeholder="Note title">
+  <textarea id="content" class="mt-3" rows="4" placeholder="Write note..."></textarea>
+
+  <button onclick="addNote()"
+  class="bg-blue-500 px-4 py-2 rounded mt-3 w-full">
+    Add Note
+  </button>
+</div>
+
+<!-- SEARCH -->
+<input id="search" oninput="filterNotes(this.value)"
+placeholder="Search notes..." class="mb-5"/>
+
+<!-- NOTES -->
+<div id="notes" class="grid md:grid-cols-3 gap-4"></div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("smork_notes")) || [];
+
+render();
+
+/* ADD NOTE */
+function addNote(){
+  let title=document.getElementById("title").value;
+  let content=document.getElementById("content").value;
+
+  if(!title || !content){
+    toast("Fill all fields ⚠️");
+    return;
+  }
+
+  notes.unshift({
+    title,
+    content,
+    time:new Date().toLocaleString()
+  });
+
+  localStorage.setItem("smork_notes",JSON.stringify(notes));
+
+  document.getElementById("title").value="";
+  document.getElementById("content").value="";
+
+  render();
+  toast("Note saved ✅");
+}
+
+/* DELETE */
+function del(i){
+  notes.splice(i,1);
+  localStorage.setItem("smork_notes",JSON.stringify(notes));
+  render();
+  toast("Deleted ❌");
+}
+
+/* SEARCH */
+function filterNotes(q){
+  let filtered = notes.filter(n =>
+    n.title.toLowerCase().includes(q.toLowerCase()) ||
+    n.content.toLowerCase().includes(q.toLowerCase())
+  );
+  render(filtered);
+}
+
+/* RENDER */
+function render(list=notes){
+  notesDiv.innerHTML="";
+
+  list.forEach((n,i)=>{
+    notesDiv.innerHTML+=`
+    <div class="glass p-4 rounded-xl card">
+      <h3 class="font-bold">${n.title}</h3>
+      <p class="text-gray-300 text-sm mt-2">${n.content}</p>
+      <p class="text-gray-500 text-xs mt-2">${n.time}</p>
+
+      <button onclick="del(${i})"
+      class="text-red-400 mt-3 text-sm">
+        Delete
+      </button>
+    </div>`;
+  });
+}
+
+/* TOAST */
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.innerText=msg;
+  t.style.opacity=1;
+  setTimeout(()=>t.style.opacity=0,2000);
+}
+</script>
+
+</body>
+  </html>
