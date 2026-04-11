@@ -13,31 +13,32 @@ body{
   background: radial-gradient(circle at top,#0b1430,#050816);
   color:white;
   font-family:system-ui;
-  overflow-x:hidden;
   scroll-behavior:smooth;
 }
 
-/* HEADER FLOAT */
-h1{
-  animation:float 3s ease-in-out infinite;
-}
-@keyframes float{
-  0%{transform:translateY(0)}
-  50%{transform:translateY(-5px)}
-  100%{transform:translateY(0)}
+/* NAV */
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:12px;
+  background:rgba(0,0,0,0.3);
+  backdrop-filter:blur(10px);
+  display:flex;
+  justify-content:space-between;
+  z-index:1000;
 }
 
-/* GLASS FINTECH STYLE */
+/* GLASS */
 .glass{
   background:rgba(255,255,255,0.04);
-  backdrop-filter:blur(18px);
+  backdrop-filter:blur(16px);
   border:1px solid rgba(0,140,255,0.25);
-  box-shadow:0 10px 30px rgba(0,0,0,0.3);
   transition:.3s;
 }
 .glass:hover{
-  transform:translateY(-6px);
-  box-shadow:0 20px 50px rgba(0,140,255,0.18);
+  transform:translateY(-5px);
 }
 
 /* INPUT */
@@ -45,10 +46,23 @@ input, textarea{
   width:100%;
   padding:10px;
   border-radius:10px;
-  outline:none;
   background:#0a0f2c;
-  color:white;
   border:1px solid rgba(0,140,255,0.2);
+  color:white;
+}
+
+/* CARD */
+.card{
+  transition:.3s;
+}
+.card:hover{
+  transform:scale(1.03);
+}
+
+/* SECTIONS (2 PAGES) */
+section{
+  min-height:100vh;
+  padding:80px 20px 40px;
 }
 
 /* BUTTON */
@@ -59,24 +73,15 @@ button:hover{
   transform:scale(1.03);
 }
 
-/* NOTE CARD */
-.card{
-  transition:.3s;
-}
-.card:hover{
-  transform:scale(1.03);
-}
-
 /* SIDEBAR SOCIAL */
 .sidebar{
   position:fixed;
   right:10px;
-  top:20%;
+  top:30%;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-
 .icon{
   width:40px;
   height:40px;
@@ -86,137 +91,112 @@ button:hover{
   border-radius:10px;
   background:rgba(0,140,255,0.1);
   border:1px solid rgba(0,140,255,0.2);
-  transition:.3s;
-}
-.icon:hover{
-  transform:scale(1.1);
-  background:rgba(0,140,255,0.25);
-}
-
-/* TOAST */
-.toast{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#0a0f2c;
-  padding:10px 14px;
-  border-radius:10px;
-  opacity:0;
-  transition:.3s;
 }
 </style>
 </head>
 
-<body class="p-5">
+<body>
 
-<!-- SIDEBAR SOCIAL HUB -->
+<!-- NAV -->
+<nav>
+  <div>☁️ SMORK APP</div>
+  <div class="flex gap-4 text-sm">
+    <a href="#page1">Notes</a>
+    <a href="#page2">Profile</a>
+  </div>
+</nav>
+
+<!-- SIDEBAR SOCIAL -->
 <div class="sidebar">
-  <a class="icon" href="https://www.instagram.com/smork_frmdaeast" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-  <a class="icon" href="https://www.facebook.com/share/1DhHJPTRXL/" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-  <a class="icon" href="https://www.linkedin.com/in/smorkfrmdaeast" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
-  <a class="icon" href="https://github.com/Smorkfrmdaeast" target="_blank"><i class="fa-brands fa-github"></i></a>
+  <a class="icon" href="https://www.instagram.com/smork_frmdaeast"><i class="fa-brands fa-instagram"></i></a>
+  <a class="icon" href="https://github.com/Smorkfrmdaeast"><i class="fa-brands fa-github"></i></a>
   <a class="icon" href="mailto:ifeanyinuels32@gmail.com"><i class="fa-solid fa-envelope"></i></a>
-  <a class="icon" href="https://wa.me/2349019071679" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+  <a class="icon" href="https://wa.me/2349019071679"><i class="fa-brands fa-whatsapp"></i></a>
 </div>
 
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-6">
-  <h1 class="text-xl font-bold">📝 SMORK NOTES PRO</h1>
-  <span class="text-blue-400 text-sm">Fintech Workspace UI</span>
-</div>
+<!-- PAGE 1 -->
+<section id="page1">
 
-<!-- INPUT -->
+<h1 class="text-xl font-bold mb-5">📝 NOTES DASHBOARD</h1>
+
 <div class="glass p-4 rounded-xl mb-5">
-  <input id="title" placeholder="Note title">
-  <textarea id="content" class="mt-3" rows="4" placeholder="Write your note..."></textarea>
-
-  <button onclick="addNote()"
-  class="bg-blue-500 px-4 py-2 rounded mt-3 w-full">
+  <input id="title" placeholder="Title">
+  <textarea id="content" class="mt-3" rows="3" placeholder="Write note..."></textarea>
+  <button onclick="addNote()" class="bg-blue-500 px-4 py-2 rounded mt-3 w-full">
     Add Note
   </button>
 </div>
 
-<!-- SEARCH -->
-<input id="search" oninput="filterNotes(this.value)"
-placeholder="Search notes..." class="mb-5"/>
+<input id="search" oninput="filterNotes(this.value)" placeholder="Search..." class="mb-5"/>
 
-<!-- NOTES -->
 <div id="notes" class="grid md:grid-cols-3 gap-4"></div>
 
-<div id="toast" class="toast"></div>
+</section>
+
+<!-- PAGE 2 -->
+<section id="page2">
+
+<h1 class="text-xl font-bold mb-5">🌐 PROFILE HUB</h1>
+
+<div class="glass p-4 rounded-xl mb-4">
+  <h2 class="font-bold">SMORK FRMDAEAST</h2>
+  <p class="text-gray-400 text-sm">Software Engineer • Creator • Developer</p>
+</div>
+
+<div class="glass p-4 rounded-xl mb-4">
+  <p>📧 Email: ifeanyinuels32@gmail.com</p>
+  <p>📱 WhatsApp: 09019071679</p>
+</div>
+
+<div class="glass p-4 rounded-xl">
+  <h3 class="font-bold mb-2">Social Links</h3>
+  <p>Instagram, GitHub, LinkedIn, Facebook all connected</p>
+</div>
+
+</section>
 
 <script>
-let notes = JSON.parse(localStorage.getItem("smork_notes_pro")) || [];
+let notes = JSON.parse(localStorage.getItem("smork_twopage")) || [];
 
 render();
 
-/* ADD NOTE */
+/* ADD */
 function addNote(){
-  let title=document.getElementById("title").value;
-  let content=document.getElementById("content").value;
+  let t=document.getElementById("title").value;
+  let c=document.getElementById("content").value;
 
-  if(!title || !content){
-    toast("Fill all fields ⚠️");
-    return;
-  }
+  if(!t||!c) return;
 
-  notes.unshift({
-    title,
-    content,
-    time:new Date().toLocaleString()
-  });
-
-  localStorage.setItem("smork_notes_pro",JSON.stringify(notes));
-
-  document.getElementById("title").value="";
-  document.getElementById("content").value="";
+  notes.unshift({t,c,time:new Date().toLocaleString()});
+  localStorage.setItem("smork_twopage",JSON.stringify(notes));
 
   render();
-  toast("Saved in cloud style UI 🚀");
 }
 
 /* DELETE */
 function del(i){
   notes.splice(i,1);
-  localStorage.setItem("smork_notes_pro",JSON.stringify(notes));
+  localStorage.setItem("smork_twopage",JSON.stringify(notes));
   render();
-  toast("Deleted ❌");
 }
 
 /* SEARCH */
 function filterNotes(q){
-  let filtered = notes.filter(n =>
-    n.title.toLowerCase().includes(q.toLowerCase()) ||
-    n.content.toLowerCase().includes(q.toLowerCase())
-  );
-  render(filtered);
+  let f=notes.filter(n=>n.t.toLowerCase().includes(q.toLowerCase()));
+  render(f);
 }
 
 /* RENDER */
 function render(list=notes){
   notesDiv.innerHTML="";
-
   list.forEach((n,i)=>{
     notesDiv.innerHTML+=`
     <div class="glass p-4 rounded-xl card">
-      <h3 class="font-bold text-blue-300">${n.title}</h3>
-      <p class="text-gray-300 text-sm mt-2">${n.content}</p>
-      <p class="text-gray-500 text-xs mt-2">${n.time}</p>
-
-      <button onclick="del(${i})"
-      class="text-red-400 mt-3 text-sm">
-        Delete
-      </button>
+      <h3 class="font-bold">${n.t}</h3>
+      <p class="text-sm text-gray-300">${n.c}</p>
+      <button onclick="del(${i})" class="text-red-400 mt-2">Delete</button>
     </div>`;
   });
-}
-
-/* TOAST */
-function toast(msg){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.style.opacity=1;
-  setTimeout(()=>t.style.opacity=0,2000);
 }
 </script>
 
