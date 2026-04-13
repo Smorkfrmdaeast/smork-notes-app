@@ -153,7 +153,7 @@ import {
   query
 } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-// CONFIG
+/* CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCVv5EmkyIc3dzQbT30JOkqBwKM_loiImk",
   authDomain: "smork-notes.firebaseapp.com",
@@ -163,16 +163,16 @@ const firebaseConfig = {
   appId: "1:475258347559:web:d39935b6f3ad442eb66e02"
 };
 
-// INIT
+/* INIT */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const notesRef = collection(db, "notes");
 
-// GLOBAL STATE
+/* STATE */
 let notes = [];
 const notesDiv = document.getElementById("notes");
 
-// REALTIME LOAD
+/* REALTIME */
 const q = query(notesRef, orderBy("time", "desc"));
 
 onSnapshot(q, (snapshot) => {
@@ -183,7 +183,7 @@ onSnapshot(q, (snapshot) => {
   render(notes);
 });
 
-// ADD
+/* ADD NOTE */
 window.addNote = async function () {
   let title = document.getElementById("title").value;
   let content = document.getElementById("content").value;
@@ -200,12 +200,12 @@ window.addNote = async function () {
   document.getElementById("content").value = "";
 };
 
-// DELETE
+/* DELETE */
 window.del = async function (id) {
   await deleteDoc(doc(db, "notes", id));
 };
 
-// SEARCH
+/* SEARCH */
 window.filterNotes = function (q) {
   let filtered = notes.filter(n =>
     n.title.toLowerCase().includes(q.toLowerCase()) ||
@@ -214,7 +214,7 @@ window.filterNotes = function (q) {
   render(filtered);
 };
 
-// RENDER
+/* RENDER */
 window.render = function (list = notes) {
   notesDiv.innerHTML = "";
 
@@ -223,6 +223,11 @@ window.render = function (list = notes) {
       <div class="glass p-4 rounded-xl card mb-3">
         <h3 class="font-bold">${n.title}</h3>
         <p class="text-gray-300 text-sm mt-2">${n.content}</p>
+
+        <p class="text-gray-500 text-xs mt-2">
+          ${new Date(n.time).toLocaleString()}
+        </p>
+
         <button onclick="del('${n.id}')" class="text-red-400 mt-3 text-sm">
           Delete
         </button>
