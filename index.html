@@ -16,7 +16,6 @@ body{
   scroll-behavior:smooth;
 }
 
-/* NAV */
 nav{
   position:fixed;
   top:0;
@@ -30,18 +29,14 @@ nav{
   z-index:1000;
 }
 
-/* GLASS */
 .glass{
   background:rgba(255,255,255,0.04);
   backdrop-filter:blur(16px);
   border:1px solid rgba(0,140,255,0.25);
   transition:.3s;
 }
-.glass:hover{
-  transform:translateY(-5px);
-}
+.glass:hover{ transform:translateY(-5px); }
 
-/* INPUT */
 input, textarea{
   width:100%;
   padding:10px;
@@ -51,29 +46,17 @@ input, textarea{
   color:white;
 }
 
-/* CARD */
-.card{
-  transition:.3s;
-}
-.card:hover{
-  transform:scale(1.03);
-}
+.card{ transition:.3s; }
+.card:hover{ transform:scale(1.03); }
 
-/* SECTIONS (2 PAGES) */
 section{
   min-height:100vh;
   padding:80px 20px 40px;
 }
 
-/* BUTTON */
-button{
-  transition:.3s;
-}
-button:hover{
-  transform:scale(1.03);
-}
+button{ transition:.3s; }
+button:hover{ transform:scale(1.03); }
 
-/* SIDEBAR SOCIAL */
 .sidebar{
   position:fixed;
   right:10px;
@@ -82,6 +65,7 @@ button:hover{
   flex-direction:column;
   gap:10px;
 }
+
 .icon{
   width:40px;
   height:40px;
@@ -106,7 +90,7 @@ button:hover{
   </div>
 </nav>
 
-<!-- SIDEBAR SOCIAL -->
+<!-- SIDEBAR -->
 <div class="sidebar">
   <a class="icon" href="https://www.instagram.com/smork_frmdaeast"><i class="fa-brands fa-instagram"></i></a>
   <a class="icon" href="https://github.com/Smorkfrmdaeast"><i class="fa-brands fa-github"></i></a>
@@ -129,7 +113,7 @@ button:hover{
 
 <input id="search" oninput="filterNotes(this.value)" placeholder="Search..." class="mb-5"/>
 
-<div id="notes" class="grid md:grid-cols-3 gap-4"></div>
+<div id="notes"></div>
 
 </section>
 
@@ -150,54 +134,102 @@ button:hover{
 
 <div class="glass p-4 rounded-xl">
   <h3 class="font-bold mb-2">Social Links</h3>
-  <p>Instagram, GitHub, LinkedIn, Facebook all connected</p>
+  <p>Instagram, GitHub, LinkedIn, Facebook connected</p>
 </div>
 
 </section>
 
-<script>
-let notes = JSON.parse(localStorage.getItem("smork_twopage")) || [];
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-render();
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCVv5EmkyIc3dzQbT30JOkqBwKM_loiImk",
+  authDomain: "smork-notes.firebaseapp.com",
+  projectId: "smork-notes",
+  storageBucket: "smork-notes.firebasestorage.app",
+  messagingSenderId: "475258347559",
+  appId: "1:475258347559:web:d39935b6f3ad442eb66e02"
+};
 
-/* ADD */
-function addNote(){
-  let t=document.getElementById("title").value;
-  let c=document.getElementById("content").value;
+// INIT
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const notesRef = collection(db, "notes");
 
-  if(!t||!c) return;
+// GLOBAL STATE
+let notes = [];
+const notesDiv = document.getElementById("notes");
 
-  notes.unshift({t,c,time:new Date().toLocaleString()});
-  localStorage.setItem("smork_twopage",JSON.stringify(notes));
+// REALTIME LOAD
+const q = query(notesRef, orderBy("time", "desc"));
 
-  render();
-}
-
-/* DELETE */
-function del(i){
-  notes.splice(i,1);
-  localStorage.setItem("smork_twopage",JSON.stringify(notes));
-  render();
-}
-
-/* SEARCH */
-function filterNotes(q){
-  let f=notes.filter(n=>n.t.toLowerCase().includes(q.toLowerCase()));
-  render(f);
-}
-
-/* RENDER */
-function render(list=notes){
-  notesDiv.innerHTML="";
-  list.forEach((n,i)=>{
-    notesDiv.innerHTML+=`
-    <div class="glass p-4 rounded-xl card">
-      <h3 class="font-bold">${n.t}</h3>
-      <p class="text-sm text-gray-300">${n.c}</p>
-      <button onclick="del(${i})" class="text-red-400 mt-2">Delete</button>
-    </div>`;
+onSnapshot(q, (snapshot) => {
+  notes = [];
+  snapshot.forEach((d) => {
+    notes.push({ id: d.id, ...d.data() });
   });
-}
+  render(notes);
+});
+
+// ADD
+window.addNote = async function () {
+  let title = document.getElementById("title").value;
+  let content = document.getElementById("content").value;
+
+  if (!title || !content) return;
+
+  await addDoc(notesRef, {
+    title,
+    content,
+    time: Date.now()
+  });
+
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
+};
+
+// DELETE
+window.del = async function (id) {
+  await deleteDoc(doc(db, "notes", id));
+};
+
+// SEARCH
+window.filterNotes = function (q) {
+  let filtered = notes.filter(n =>
+    n.title.toLowerCase().includes(q.toLowerCase()) ||
+    n.content.toLowerCase().includes(q.toLowerCase())
+  );
+  render(filtered);
+};
+
+// RENDER
+window.render = function (list = notes) {
+  notesDiv.innerHTML = "";
+
+  list.forEach((n) => {
+    notesDiv.innerHTML += `
+      <div class="glass p-4 rounded-xl card mb-3">
+        <h3 class="font-bold">${n.title}</h3>
+        <p class="text-gray-300 text-sm mt-2">${n.content}</p>
+        <button onclick="del('${n.id}')" class="text-red-400 mt-3 text-sm">
+          Delete
+        </button>
+      </div>
+    `;
+  });
+};
 </script>
 
 </body>
